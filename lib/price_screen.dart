@@ -2,9 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bitcoin_ticker/coin_data.dart';
 
-import 'coin_data.dart';
-import 'coin_data.dart';
-import 'coin_data.dart';
+import 'dart:io' show Platform;
 import 'coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
@@ -13,7 +11,35 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  Widget _buildAndroidPicker() {
+    return DropdownButton(
+        value: selectedValue,
+        onChanged: (value) {
+          setState(() {
+            selectedValue = value;
+          });
+        },
+        // elevation: 5,
+        items: currenciesList
+            .map((e) => new DropdownMenuItem(
+                  child: Text(e),
+                  value: e,
+                ))
+            .toList());
+  }
+
+  Widget _buildIOSPicker() {
+    return CupertinoPicker(
+      itemExtent: 40,
+      onSelectedItemChanged: (int value) {
+        print(currenciesList[value]);
+      },
+      children: currenciesList.map((e) => Text(e)).toList(),
+    );
+  }
+
   String selectedValue = currenciesList[0];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,34 +72,15 @@ class _PriceScreenState extends State<PriceScreen> {
             ),
           ),
           Container(
-              height: 150.0,
-              alignment: Alignment.center,
-              padding: EdgeInsets.only(bottom: 30.0),
-              color: Colors.lightBlue,
-              child: CupertinoPicker(
-                itemExtent: 40,
-                onSelectedItemChanged: (int value) {
-                  print(currenciesList[value]);
-                },
-                children: currenciesList.map((e) => Text(e)).toList(),
-              )),
+            height: 150.0,
+            alignment: Alignment.center,
+            padding: EdgeInsets.only(bottom: 30.0),
+            color: Colors.lightBlue,
+            child:
+                Platform.isAndroid ? _buildAndroidPicker() : _buildIOSPicker(),
+          ),
         ],
       ),
     );
   }
 }
-
-// DropdownButton(
-//                 value: selectedValue,
-//                 onChanged: (value) {
-//                   setState(() {
-//                     selectedValue = value;
-//                   });
-//                 },
-//                 // elevation: 5,
-//                 items: currenciesList
-//                     .map((e) => new DropdownMenuItem(
-//                           child: Text(e),
-//                           value: e,
-//                         ))
-//                     .toList()),
