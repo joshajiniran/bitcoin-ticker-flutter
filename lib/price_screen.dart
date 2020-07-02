@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:bitcoin_ticker/coin_data.dart';
 
 import 'dart:io' show Platform;
-import 'coin_data.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -11,11 +10,19 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  String selectedValue = currenciesList[0];
+
+  void getBitcoinData() async {
+    CoinData coinData = CoinData();
+    var bitcoinData = await coinData.getCoinData();
+    print(bitcoinData);
+  }
+
   Widget _buildAndroidPicker() {
     return DropdownButton(
         value: selectedValue,
         onChanged: (value) {
-          setState(() {
+          setState(() async {
             selectedValue = value;
           });
         },
@@ -38,7 +45,11 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  String selectedValue = currenciesList[0];
+  @override
+  void initState() {
+    super.initState();
+    getBitcoinData();
+  }
 
   @override
   Widget build(BuildContext context) {
