@@ -1,7 +1,6 @@
 import 'networking.dart';
 
 const apiKey = '919C70AE-3029-4A9C-9DB5-AA2B7E61A402';
-const coinDataURL = 'https://rest.coinapi.io/v1/exchangerate/BTC/USD';
 
 const List<String> currenciesList = [
   'AUD',
@@ -34,11 +33,18 @@ const List<String> cryptoList = [
 ];
 
 class CoinData {
-  Future<dynamic> getCoinData() async {
-    NetworkHelper networkHelper =
-        NetworkHelper(coinDataURL, {'X-CoinApi-Key': apiKey});
-
-    var coinData = await networkHelper.getData();
-    return coinData;
+  Future<Map<String, int>> getCoinData(String currency) async {
+    var cryptoData = Map<String, int>();
+    for (String crypto in cryptoList) {
+      String coinDataURL =
+          'https://rest.coinapi.io/v1/exchangerate/$crypto/$currency';
+      NetworkHelper networkHelper =
+          NetworkHelper(coinDataURL, {'X-CoinApi-Key': apiKey});
+      var coinData = await networkHelper.getData(); // get the data from the api
+      double convertedData = coinData["rate"];
+      cryptoData[crypto] = convertedData.round();
+    }
+    print(cryptoData);
+    return cryptoData;
   }
 }

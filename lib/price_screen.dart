@@ -13,13 +13,13 @@ class _PriceScreenState extends State<PriceScreen> {
   String selectedValue = currenciesList[0];
   int exchangeRate = 0;
   CoinData coinData = CoinData();
+  var cryptoAPIData = Map<String, int>();
 
   void getCoinDataRate() async {
-    var data = await coinData.getCoinData();
-    // convert data to int
-    double convertedData = data["rate"];
+    cryptoAPIData = await coinData.getCoinData(selectedValue);
+
     setState(() {
-      exchangeRate = convertedData.toInt();
+      cryptoAPIData = cryptoAPIData;
     });
   }
 
@@ -51,6 +51,18 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
+  List<Widget> _buildCryptoCards() {
+    return cryptoList
+        .map(
+          (e) => CryptoCard(
+            crypto: e,
+            exchangeRate: cryptoAPIData[e],
+            selectedValue: selectedValue,
+          ),
+        )
+        .toList();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -67,26 +79,10 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  '1 BTC = ${exchangeRate.round()} USD',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: _buildCryptoCards(),
           ),
           Container(
             height: 150.0,
@@ -97,6 +93,44 @@ class _PriceScreenState extends State<PriceScreen> {
                 Platform.isAndroid ? _buildAndroidPicker() : _buildIOSPicker(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoCard extends StatelessWidget {
+  const CryptoCard({
+    Key key,
+    @required this.exchangeRate,
+    @required this.selectedValue,
+    @required this.crypto,
+  }) : super(key: key);
+
+  final int exchangeRate;
+  final String selectedValue;
+  final String crypto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $crypto = $exchangeRate $selectedValue',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
